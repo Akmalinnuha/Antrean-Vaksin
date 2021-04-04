@@ -1,5 +1,5 @@
 import java.util.Scanner;
-public class Coba{
+public class Main{
     private static String StatusUsia(int usia) {
         if (usia>=60) {
             return "LANSIA";
