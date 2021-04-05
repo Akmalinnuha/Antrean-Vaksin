@@ -1,5 +1,7 @@
+package Java.AntreVaksin.src;
+
 import java.util.Scanner;
-public class Main{
+public class Coba{
     private static String StatusUsia(int usia) {
         if (usia>=60) {
             return "LANSIA";
@@ -40,20 +42,42 @@ public class Main{
                             String Nama_Penerima=array[i][1];
                             int usia=Integer.parseInt(array[i][2]);
                             int tensi=Integer.parseInt(array[i][3]);
+                            int batas = Integer.parseInt(array[0][0]);
                             if (tensi>=180) {
                                 System.out.println("TOLAK "+Nama_Penerima+" "+StatusUsia(usia)+" TENSI_TIDAKBOLEH_DIVAKSIN");
                             } else {
-                                System.out.println("ANTRE "+Nama_Penerima+" "+StatusUsia(usia));
-                                if (usia>=60) {
-                                    pasien_antre.addFirst(Nama_Penerima);
+                                if(pasien_antre.getsize()<batas) {
+                                    System.out.println("ANTRE "+Nama_Penerima+" "+StatusUsia(usia));
+                                    if (usia>=60) {
+                                        pasien_antre.addFirst(Nama_Penerima);
+                                    } else {
+                                        pasien_antre.addLast(Nama_Penerima);
+                                    }
                                 } else {
-                                    pasien_antre.addLast(Nama_Penerima);
+                                    if (usia>=60) {
+                                        pasien_antre.addFirst(Nama_Penerima);
+                                        System.out.print("ANTRE "+Nama_Penerima+" "+StatusUsia(usia));
+                                        pasien_tunggu.addLast(pasien_antre.tail.data);
+                                        System.out.print(" TUNGGU "+pasien_antre.tail.data+"\n");
+                                        pasien_antre.removeLast();
+                                    } else {
+                                        System.out.println("TUNGGU "+Nama_Penerima+" "+StatusUsia(usia));
+                                        pasien_tunggu.addLast(Nama_Penerima);
+                                    }
                                 }
                             }
                             break;
                         case "UKURAN":
                             int n=Integer.parseInt(array[i][1]);
-                            System.out.println("Ukuran Daftar Antre berubah jadi "+n);
+                            System.out.println("SUKSES UBAH "+array[0][0]+" "+n);
+                            array[0][0] = Integer.toString(n);
+                            if (n>pasien_antre.getsize()) {
+                                pasien_antre.addLast(pasien_tunggu.head.data);
+                                pasien_tunggu.removeFirst();
+                            } else {
+                                pasien_tunggu.addLast(pasien_antre.tail.data);
+                                pasien_antre.removeLast();
+                            }
                             break;
                         case "SELESAI":
                             int nSelesai=Integer.parseInt(array[i][1]);
@@ -63,26 +87,44 @@ public class Main{
                             }
                             break;
                         case "SELESAI_NAMA":
-                            pasien_antre.removeFirst();
-                            pasien_tunggu.removeFirst();
+                            Object x = array[i][1];
+                            pasien_antre.remove(x);
+                            //pasien_tunggu.removeFirst();
                             System.out.println("Selesai Nama "+array[i][1]);
                             break;
                         case "SKIP":
-                            String nama_Penerima = array[i][1];
-                            pasien_antre.remove(nama_Penerima);
-                            pasien_tunggu.addLast(nama_Penerima);
-                            System.out.println("Skip "+array[i][1]);
+                        String nama_Penerima = array[i][1];
+                            if(pasien_antre.isEmpty()) {
+                                System.out.println("SKIP GAGAL");
+                            } else {
+                                pasien_antre.remove(nama_Penerima);
+                                pasien_tunggu.addLast(nama_Penerima);
+                                System.out.println("SKIP SUKSES");
+                            }
                             break;
                         case "STATUS":
-                        pasien_antre.print();
+                        if (pasien_antre.isEmpty()) {
+                            System.out.println("DAFTAR_ANTRE : -");
+                        } else {
+                            System.out.print("DAFTAR_ANTRE : ");
+                            pasien_antre.print();
+                        }
+
+                        if (pasien_tunggu.isEmpty()) {
+                            System.out.println("DAFTAR_TUNGGU : -");
+                        } else {
+                            System.out.print("DAFTAR_TUNGGU : ");
+                            pasien_tunggu.print();
+                        }
                             break;
                         default:
                             break;
                     }
-            }
+                }
         }
     }
 }
+
 class QueueArray {
     Node head;
     Node tail;
@@ -132,6 +174,19 @@ class QueueArray {
             a = a.next;
         }
         size--;
+    }
+	
+	void removeLast() {
+        if (head == tail) {
+              inisialisasiNull();
+        } else {
+              Node s = head;
+              while (s.next != tail)
+                   s = s.next;
+              tail = s;
+              tail.next = null;
+              size--;
+        }
     }
 
     public void addFirst(Object x) {
